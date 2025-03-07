@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>數學因式分解練習</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .button-container {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        #question, #answer {
+            margin: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>數學因式分解練習</h1>
+    <div class="button-container">
+        <button onclick="generateQuestion('easy')">簡單題目</button>
+        <button onclick="generateQuestion('medium')">中等題目</button>
+        <button onclick="generateQuestion('hard')">困難題目</button>
+        <button onclick="generateQuestion('challenge')">挑戰題目</button>
+        <button onclick="showAnswer()">顯示答案</button>
+    </div>
+    <div id="question"></div>
+    <div id="answer" style="display: none;"></div>
+
+    <script>
+        let currentAnswer = "";
+
+        // 格式化係數的輔助函數
+        function formatTerm(coef, term) {
+            if (coef === 0) return "";
+            if (coef === 1 && term === "x") return "+x";
+            if (coef === -1 && term === "x") return "-x";
+            if (coef === 1 && term !== "") return `+${term}`;
+            if (coef === -1 && term !== "") return `-${term}`;
+            return `${coef >= 0 ? "+" : ""}${coef}${term}`;
+        }
+
+        // 題目生成函數
+        function generateQuestion(difficulty) {
+            let question = "";
+            let answer = "";
+
+            if (difficulty === "easy") {
+                // 簡單題目：a(bx + c)
+                const a = Math.floor(Math.random() * 20) + 1; // 1 到 20
+                const b = Math.floor(Math.random() * 20) + 1; // 1 到 20
+                const c = Math.floor(Math.random() * 20) + 1; // 1 到 20
+
+                question = `${formatTerm(a * b, "x")} ${formatTerm(a * c, "")}`;
+                answer = `${a}(${formatTerm(b, "x").replace("+", "")} ${formatTerm(c, "")})`;
+            } else if (difficulty === "medium") {
+                // 中等題目：k(x + a)(x + b)
+                const k = Math.floor(Math.random() * 10) + 1; // 1 到 10
+                const a = Math.floor(Math.random() * 20) - 10 || 1; // -10 到 10，非零
+                const b = Math.floor(Math.random() * 20) - 10 || 1; // -10 到 10，非零
+
+                const coefX2 = k;
+                const coefX = k * (a + b);
+                const coefConst = k * a * b;
+
+                question = `${formatTerm(coefX2, "x^2")} ${formatTerm(coefX, "x")} ${formatTerm(coefConst, "")}`;
+                answer = a === b ? `${k === 1 ? "" : k}(x ${formatTerm(a, "")})^2` : `${k === 1 ? "" : k}(x ${formatTerm(a, "")})(x ${formatTerm(b, "")})`;
+            } else if (difficulty === "hard") {
+                const type = Math.floor(Math.random() * 3);
+
+                if (type === 0) {
+                    // 形式 1: (x + a)(x + b - y)
+                    const a = Math.floor(Math.random() * 20) - 10 || 1; // -10 到 10
+                    const b = Math.floor(Math.random() * 20) - 10 || 1; // -10 到 10
+
+                    const coefX2 = 1;
+                    const coefX = a + b;
+                    const coefConst = a * b;
+                    const coefXY = -1;
+                    const coefY = -a;
+
+                    question = `${formatTerm(coefX2, "x^2")} ${formatTerm(coefX, "x")} ${formatTerm(coefConst, "")} ${formatTerm(coefXY, "xy")} ${formatTerm(coefY, "y")}`;
+                    answer = `(x ${formatTerm(a, "")})(x ${formatTerm(b, "")} - y)`;
+                } else if (type === 1) {
+                    // 形式 2: (x + a)(y - x + b)
+                    const a = Math.floor(Math.random() * 20) - 10 || 1; // -10 到 10
+                    const b = Math.floor(Math.random() * 20) - 10 || 1; // -10 到 10
+
+                    const coefX2 = -1;
+                    const coefX = b - a;
+                    const coefConst = a * b;
+                    const coefXY = 1;
+                    const coefY = a;
+
+                    question = `${formatTerm(coefX2, "x^2")} ${formatTerm(coefX, "x")} ${formatTerm(coefConst, "")} ${formatTerm(coefXY, "xy")} ${formatTerm(coefY, "y")}`;
+                    answer = `(x ${formatTerm(a, "")})(y - x ${formatTerm(b, "")})`;
+                } else {
+                    // 形式 3: (x + a)(y - x^2 - bx)
+                    const a = Math.floor(Math.random() * 15) - 7 || 1; // -7 到 7
+                    const b = Math.floor(Math.random() * 15) - 7 || 1; // -7 到 7
+
+                    const coefX3 = -1;
+                    const coefX2 = -b;
+                    const coefX = 1 - a * b;
+                    const coefConst = 0;
+                    const coefXY = 1;
+                    const coefY = a;
+
+                    question = `${formatTerm(coefX3, "x^3")} ${formatTerm(coefX2, "x^2")} ${formatTerm(coefX, "x")} ${formatTerm(coefXY, "xy")} ${formatTerm(coefY, "y")}`;
+                    answer = `(x ${formatTerm(a, "")})(y - x^2 ${formatTerm(-b, "x")})`;
+                }
+            } else if (difficulty === "challenge") {
+                // 挑戰題目：(px + q)(rx^2 + sx + t)
+                const p = Math.floor(Math.random() * 10) - 5 || 1; // -5 到 5
+                const q = Math.floor(Math.random() * 20) - 10 || 1; // -10 到 10
+                const r = Math.floor(Math.random() * 10) + 1; // 1 到 10
+                const s = Math.floor(Math.random() * 20) - 10 || 1; // -10 到 10
+                const t = Math.floor(Math.random() * 20) - 10 || 1; // -10 到 10
+
+                const coefX3 = p * r;
+                const coefX2 = p * s + q * r;
+                const coefX = p * t + q * s;
+                const coefConst = q * t;
+
+                question = `${formatTerm(coefX3, "x^3")} ${formatTerm(coefX2, "x^2")} ${formatTerm(coefX, "x")} ${formatTerm(coefConst, "")}`;
+                answer = `(${formatTerm(p, "x").replace("+", "")} ${formatTerm(q, "")})(${formatTerm(r, "x^2").replace("+", "")} ${formatTerm(s, "x")} ${formatTerm(t, "")})`;
+            }
+
+            document.getElementById("question").innerHTML = `因式分解: \\(${question.replace(/^\+/, "")}\\)`;
+            currentAnswer = answer;
+            document.getElementById("answer").style.display = "none";
+            MathJax.typeset();
+        }
+
+        function showAnswer() {
+            document.getElementById("answer").innerHTML = `答案: \\(${currentAnswer}\\)`;
+            document.getElementById("answer").style.display = "block";
+            MathJax.typeset();
+        }
+    </script>
+</body>
+</html>
